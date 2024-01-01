@@ -1,13 +1,11 @@
 package com.ws;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ws.system.controller.SystemController;
 import com.ws.wiseSaying.controller.WiseSayingController;
 
 public class App {
+
+	byte system_status = 1;
 
 	public App() {
 
@@ -19,42 +17,28 @@ public class App {
 		SystemController systemController = new SystemController();
 		WiseSayingController wiseSayingController = new WiseSayingController();
 
-		while (true) {
+		while (system_status == 1) {
 			System.out.print("명령어 ) ");
 			String cmd = Container.getScanner().nextLine().trim();
+			Rq rq = new Rq(cmd);
 
-			if (cmd.equals("종료")) {
+			switch (rq.getActionCode()) {
+			case "종료":
 				systemController.exit();
+				system_status = 0;
 				break;
-			} else if (cmd.equals("등록")) {
+			case "등록":
 				wiseSayingController.write();
-			} else if (cmd.equals("목록")) {
+				break;
+			case "목록":
 				wiseSayingController.list();
-			} else if (cmd.equals("삭제")) {
-				
-				String[] cmdBits = cmd.split("\\?", 2);
-				
-				String actionCode = cmdBits[0];
-				
-				Map<String, String> params = new HashMap<>();
-				
-				String[] paramBits = cmdBits[1].split("&");
-				
-				for(String paramStr : paramBits) {
-					String[] paramStrBits = paramStr.split("=",2);
-					String key = paramStrBits[0];
-					String value = paramStrBits[1];
-					params.put(key, value);
-				}
-
-				System.out.println(Arrays.toString(cmdBits));
-				System.out.println("actionCode : " + actionCode);
-				System.out.println("params : " + params);
-				
+				break;
+			case "삭제":
 				wiseSayingController.remove();
-				
-			} else {
+				break;
+			default:
 				System.out.println("존재하지 않는 명령어입니다");
+				break;
 			}
 		}
 
